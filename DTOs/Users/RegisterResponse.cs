@@ -1,5 +1,6 @@
 namespace TutoringAcademy.DTOs.Users
 {
+    // This class represents the response data returned after a successful user registration. It includes properties such as token, user ID, name, avatar URL, username, email, and an optional contact field.
     public class RegisterResponse
     {
         public string Token { get; set; } = null!;

@@ -3,6 +3,9 @@ using MongoDB.Bson.Serialization.Attributes;
 
 namespace TutoringAcademy.Models
 {
+    // This class represents a user in the tutoring academy.
+    // It includes properties such as name, username, email, role, contact information, password hash, and lists of enrolled and teaching courses.
+    // The UserRole enumeration defines the different roles a user can have in the system, such as Admin, User, and Tutor, which can be used for authorization and access control throughout the application.
     public class User
     {
         [BsonId]
@@ -31,11 +34,11 @@ namespace TutoringAcademy.Models
         [BsonElement("passwordHash")]
         public string PasswordHash { get; set; } = null!;
 
-        // [BsonElement("enrolledCourses")]
-        // public List<string> EnrolledCourses { get; set; } = [];
+        [BsonElement("enrolledCourses")]
+        public List<string> EnrolledCourses { get; set; } = [];
 
-        // [BsonElement("teachingCourses")]
-        // public List<string> TeachingCourses { get; set; } = [];
+        [BsonElement("teachingCourses")]
+        public List<string> TeachingCourses { get; set; } = [];
     }
 
     public enum UserRole

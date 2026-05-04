@@ -1,5 +1,6 @@
 namespace TutoringAcademy.DTOs.Users
 {
+    // This class represents the response data returned after updating a user's profile. It includes properties such as user ID, name, username, avatar URL, email, and an optional contact field.
     public class UpdateUserProfileResponse
     {
         public string Id { get; set; } = null!;

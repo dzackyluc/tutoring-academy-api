@@ -1,5 +1,6 @@
 namespace TutoringAcademy.DTOs.Users
 {
+    // This class represents the input data required for user registration. It includes properties such as name, username, email, password, and an optional contact field.
     public class RegisterInput
     {
         public string Name { get; set; } = null!;
