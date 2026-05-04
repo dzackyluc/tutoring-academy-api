@@ -4,16 +4,16 @@ EXPOSE 8080
 
 FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
 WORKDIR /src
-COPY ["KopiAku.csproj", "./"]
-RUN dotnet restore "KopiAku.csproj"
+COPY ["TutoringAcademy.csproj", "./"]
+RUN dotnet restore "TutoringAcademy.csproj"
 COPY . .
 WORKDIR "/src/."
-RUN dotnet build "KopiAku.csproj" -c Release -o /app/build
+RUN dotnet build "TutoringAcademy.csproj" -c Release -o /app/build
 
 FROM build AS publish
-RUN dotnet publish "KopiAku.csproj" -c Release -o /app/publish
+RUN dotnet publish "TutoringAcademy.csproj" -c Release -o /app/publish
 
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
-ENTRYPOINT ["dotnet", "KopiAku.dll"]
+ENTRYPOINT ["dotnet", "TutoringAcademy.dll"]
