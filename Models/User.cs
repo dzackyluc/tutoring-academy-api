@@ -15,6 +15,9 @@ namespace TutoringAcademy.Models
         [BsonElement("username")]
         public string Username { get; set; } = null!;
 
+        [BsonElement("avatarUrl")]
+        public string AvatarUrl { get; set; } = null!;
+
         [BsonElement("email")]
         public string Email { get; set; } = null!;
 

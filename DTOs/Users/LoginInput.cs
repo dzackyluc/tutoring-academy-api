@@ -1,4 +1,4 @@
-namespace TutoringAcademy.DTOs
+namespace TutoringAcademy.DTOs.Users
 {
     public class LoginInput
     {

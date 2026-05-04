@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using TutoringAcademy.Services;
 using TutoringAcademy.GraphQL.Users;
+using Amazon.S3;
 
 Env.Load();
 
@@ -20,6 +21,8 @@ builder.Services.Configure<MongoDBSettings>(
     builder.Configuration.GetSection("MongoDBSettings"));
 builder.Services.Configure<JWTSettings>(
     builder.Configuration.GetSection("JWTSettings"));
+builder.Services.Configure<B2Settings>(
+    builder.Configuration.GetSection("B2Settings"));
 
 // Register services
 builder.Services.AddSingleton<JWTService>();
@@ -27,6 +30,14 @@ builder.Services.AddSingleton(sp => {
     var settings = sp.GetRequiredService<IOptions<MongoDBSettings>>().Value;
     var client = new MongoDB.Driver.MongoClient(settings.ConnectionString);
     return client.GetDatabase(settings.DatabaseName);
+});
+builder.Services.AddSingleton<IAmazonS3>(sp => {
+    var b2Settings = sp.GetRequiredService<IOptions<B2Settings>>().Value;
+    return new AmazonS3Client(b2Settings.AccessKey, b2Settings.SecretKey, new AmazonS3Config
+    {
+        ServiceURL = b2Settings.BaseUrl,
+        ForcePathStyle = true
+    });
 });
 
 builder.Services.AddAuthentication(options =>
