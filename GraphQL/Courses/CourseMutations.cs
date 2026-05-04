@@ -1,6 +1,7 @@
 using HotChocolate.Authorization;
 using HotChocolate.Data;
 using MongoDB.Driver;
+using TutoringAcademy.DTOs.Courses;
 using TutoringAcademy.Models;
 
 namespace TutoringAcademy.GraphQL.Courses
@@ -10,18 +11,28 @@ namespace TutoringAcademy.GraphQL.Courses
     {
         [Authorize(Roles = new[] { "Admin" })]
         public async Task<Course> CreateCourseAsync(
-            string title,
-            string description,
+            CreateCourseInput input,
             [Service] IMongoDatabase database)
         {
             var coursesCollection = database.GetCollection<Course>("courses");
-            var newCourse = new Course
+
+            var course = new Course
             {
-                Title = title,
-                Description = description
+                Title = input.Title,
+                Description = input.Description,
+                ShortDescription = input.ShortDescription,
+                Price = input.Price,
+                TutorId = input.TutorId,
+                Level = input.Level,
+                IsFree = input.IsFree,
+                Status = input.Status,
+                TotalSections = input.TotalSections,
+                TotalLectures = input.TotalLectures,
+                TotalDuration = input.TotalDuration
             };
-            await coursesCollection.InsertOneAsync(newCourse);
-            return newCourse;
+
+            await coursesCollection.InsertOneAsync(course);
+            return course;
         }
     }
 }
