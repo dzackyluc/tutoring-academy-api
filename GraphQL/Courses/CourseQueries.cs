@@ -10,7 +10,6 @@ namespace TutoringAcademy.GraphQL.Courses
     public class CourseQueries
     {
         // This query allows authenticated users to retrieve a list of courses. It supports projection, filtering, and sorting.
-        [Authorize]
         [UseProjection]
         [UseFiltering]
         [UseSorting]
