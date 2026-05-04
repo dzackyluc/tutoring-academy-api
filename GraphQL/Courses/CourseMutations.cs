@@ -1,3 +1,5 @@
+using Amazon.S3;
+using Amazon.S3.Model;
 using HotChocolate.Authorization;
 using HotChocolate.Data;
 using MongoDB.Driver;
@@ -8,19 +10,46 @@ namespace TutoringAcademy.GraphQL.Courses
 {
     // This class defines GraphQL mutations for creating, updating, and deleting courses.
     [ExtendObjectType(typeof(Mutation))]
-    public class CourseMutations
+    public class CourseMutations(IAmazonS3 s3Client)
     {
+        // S3 client for handling thumbnail uploads
+        private readonly IAmazonS3 _s3Client = s3Client;
+
+        // S3 bucket name for storing course thumbnails
+        private readonly string _bucketName = "tutoring-academy-bucket";
+        
         // This mutation allows an admin to create a new course. It takes a CreateCourseInput object as input and returns a CreateCourseResponse object.
         [Authorize(Roles = new[] { "Admin" })]
         public async Task<CreateCourseResponse> CreateCourseAsync(
             CreateCourseInput input,
+            [GraphQLType(typeof(UploadType))] IFile? thumbnail,
             [Service] IMongoDatabase database)
         {
             var coursesCollection = database.GetCollection<Course>("courses");
+            var thumbnailUrl = "https://ui-avatars.com/api/?size=512&font-size=0.01&background=0D8ABC";
+            var slug = input.Title.ToLower().Replace(" ", "-");
+
+            if (thumbnail != null)
+            {
+                // Handle thumbnail upload and set the thumbnail URL in the course object
+                var imageKey = $"course-thumbnails/{Guid.NewGuid()}-{thumbnail.Name}";
+                using var stream = thumbnail.OpenReadStream();
+                var putRequest = new PutObjectRequest
+                {
+                    BucketName = _bucketName,
+                    Key = imageKey,
+                    InputStream = stream,
+                    ContentType = thumbnail.ContentType
+                };
+                await _s3Client.PutObjectAsync(putRequest);
+                thumbnailUrl = $"https://storage.czn.my.id/{_bucketName}/{imageKey}";
+            }
 
             var course = new Course
             {
                 Title = input.Title,
+                Slug = slug,
+                ThumbnailUrl = thumbnailUrl,
                 Description = input.Description,
                 ShortDescription = input.ShortDescription,
                 Price = input.Price,
@@ -40,6 +69,7 @@ namespace TutoringAcademy.GraphQL.Courses
                 ShortDescription = course.ShortDescription,
                 Price = course.Price,
                 Level = course.Level,
+                ThumbnailUrl = course.ThumbnailUrl,
                 IsFree = course.IsFree,
                 Status = course.Status,
                 TotalSections = course.TotalSections,

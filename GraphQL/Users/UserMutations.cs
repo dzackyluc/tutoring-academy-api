@@ -134,7 +134,7 @@ namespace TutoringAcademy.GraphQL.Users
                         ContentType = profilePicture.ContentType
                     };
                     await _s3Client.PutObjectAsync(putRequest);
-                user.AvatarUrl = $"https://storage.czn.my.id/{_bucketName}/{imageKey}";
+                updateDef = updateDef.Set(u => u.AvatarUrl, $"https://storage.czn.my.id/{_bucketName}/{imageKey}");
             }
 
             // Update the user's profile information in the database

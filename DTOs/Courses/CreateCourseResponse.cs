@@ -8,6 +8,7 @@ namespace TutoringAcademy.DTOs.Courses
         public string Title { get; set; } = null!;
         public string Description { get; set; } = null!;
         public string ShortDescription { get; set; } = null!;
+        public string ThumbnailUrl { get; set; } = null!;
         public double Price { get; set; }
         public CourseLevel Level { get; set; }
         public bool IsFree { get; set; }

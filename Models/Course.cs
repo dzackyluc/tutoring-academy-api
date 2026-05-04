@@ -18,6 +18,9 @@ namespace TutoringAcademy.Models
         [BsonElement("slug")]
         public string Slug { get; set; } = null!;
 
+        [BsonElement("thumbnailUrl")]
+        public string ThumbnailUrl { get; set; } = null!;
+
         [BsonElement("description")]
         public string Description { get; set; } = null!;
 
