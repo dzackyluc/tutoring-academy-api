@@ -61,6 +61,16 @@ builder.Services.AddAuthentication(options =>
         ClockSkew = TimeSpan.Zero
     };
 });
+// CORS policy is configured to allow any origin, method, and header, enabling cross-origin requests from any client application that needs to interact with the API.
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAll", builder =>
+    {
+        builder.AllowAnyOrigin()
+               .AllowAnyMethod()
+               .AllowAnyHeader();
+    });
+});
 // The GraphQL server is configured with query and mutation types, as well as extensions for user-related operations. 
 // It also includes authorization and MongoDB-specific features such as filtering, sorting, projections, and paging providers to enhance the functionality of the GraphQL API for the tutoring academy application.
 builder.Services.AddControllers();
@@ -100,6 +110,9 @@ app.MapGraphQL();
 
 // The HTTPS redirection middleware is added to the request pipeline, ensuring that all incoming requests are redirected to use HTTPS for secure communication between clients and the server.
 app.UseHttpsRedirection();
+// The CORS middleware is added to the request pipeline with the "AllowAll" policy, enabling cross-origin requests from any client application that needs to interact with the API.
+app.UseCors("AllowAll");
+
 
 // The application is run, starting the web server and allowing it to listen for incoming requests on the configured port.
 app.Run();
