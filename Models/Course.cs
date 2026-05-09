@@ -28,6 +28,7 @@ namespace TutoringAcademy.Models
         public string ShortDescription { get; set; } = null!;
 
         [BsonElement("level")]
+        [BsonRepresentation(BsonType.String)]
         public CourseLevel Level { get; set; }
 
         [BsonElement("price")]
@@ -37,6 +38,7 @@ namespace TutoringAcademy.Models
         public bool IsFree { get; set; }
 
         [BsonElement("status")]
+        [BsonRepresentation(BsonType.String)]
         public CourseStatus Status { get; set; }
 
         [BsonElement("totalSections")]
