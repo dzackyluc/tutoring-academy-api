@@ -8,6 +8,7 @@ using TutoringAcademy.Services;
 using TutoringAcademy.GraphQL.Users;
 using Amazon.S3;
 using TutoringAcademy.GraphQL.Courses;
+using TutoringAcademy.GraphQL.Reviews;
 
 Env.Load();
 
@@ -78,6 +79,8 @@ builder.Services
     .AddGraphQLServer()
     .AddQueryType<Query>()
     .AddMutationType<Mutation>()
+    // The DisableIntrospection method is called with a value of false, allowing clients to perform introspection queries on the GraphQL schema. This enables clients to explore the schema and understand the available types, queries, and mutations that they can interact with.
+    .DisableIntrospection(false)
     // The UserQueries and UserMutations classes are added as type extensions to the GraphQL server, allowing them to define additional queries and mutations related to user operations such as login, registration, and profile management. 
     // This modular approach helps to organize the GraphQL schema and keep user-related logic separate from other parts of the application.
     .AddTypeExtension<UserQueries>()
@@ -86,10 +89,19 @@ builder.Services
     // This modular approach helps to organize the GraphQL schema and keep course-related logic separate from other parts of the application.
     .AddTypeExtension<CourseQueries>()
     .AddTypeExtension<CourseMutations>()
+    // The ReviewQueries and ReviewMutations classes are added as type extensions to the GraphQL server, allowing them to define additional queries and mutations related to review operations such as creating, updating, and retrieving reviews. 
+    // This modular approach helps to organize the GraphQL schema and keep review-related logic separate from other parts of the application.
+    .AddTypeExtension<ReviewQueries>()
+    .AddTypeExtension<ReviewMutations>()
+    // Authorization is added to the GraphQL server, enabling the use of authorization attributes on queries and mutations to restrict access based on user roles and authentication status.
     .AddAuthorization()
+    // MongoDB-specific features are added to the GraphQL server, allowing for filtering, sorting, projections, and paging of data retrieved from MongoDB collections in response to GraphQL queries.
     .AddMongoDbFiltering()
+    // The AddMongoDbSorting method is added to enable sorting of data retrieved from MongoDB collections in response to GraphQL queries, allowing clients to specify sorting criteria for the results.
     .AddMongoDbSorting()
+    // The AddMongoDbProjections method is added to enable projections of data retrieved from MongoDB collections in response to GraphQL queries, allowing clients to specify which fields to include or exclude in the results.
     .AddMongoDbProjections()
+    // The AddMongoDbPagingProviders method is added to enable paging of data retrieved from MongoDB collections in response to GraphQL queries, allowing clients to specify pagination parameters such as page size and page number for the results.
     .AddMongoDbPagingProviders();
 
 // Build the application

@@ -9,7 +9,6 @@ namespace TutoringAcademy.GraphQL.Reviews
     public class ReviewQueries
     {
         // This query allows authenticated users to retrieve a list of reviews. It supports projection, filtering, and sorting.
-        [Authorize]
         [UseProjection]
         [UseFiltering]
         [UseSorting]
