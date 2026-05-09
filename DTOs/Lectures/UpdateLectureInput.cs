@@ -2,8 +2,8 @@ using TutoringAcademy.Models;
 
 namespace TutoringAcademy.DTOs.Lectures
 {
-    // This class represents the response data returned after creating a new lecture. It includes properties such as courseId, sectionId, title, type, youtubeEmbedId, duration, content, and order of the lecture.
-    public class CreateLectureResponse
+    // This class represents the input data required to update an existing lecture. It includes properties such as the lecture ID, course ID, section ID, title, and order of the lecture.
+    public class UpdateLectureInput
     {
         public string Id { get; set; } = null!;
         public string CourseId { get; set; } = null!;

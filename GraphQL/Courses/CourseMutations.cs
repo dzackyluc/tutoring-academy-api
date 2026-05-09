@@ -170,10 +170,22 @@ namespace TutoringAcademy.GraphQL.Courses
             [Service] IMongoDatabase database)
         {
             var coursesCollection = database.GetCollection<Course>("courses");
-            var result = await coursesCollection.DeleteOneAsync(c => c.Id == id) ?? throw new GraphQLException(ErrorBuilder.New()
+            var sectionCollection = database.GetCollection<Section>("sections");
+            var lectureCollection = database.GetCollection<Lecture>("lectures");
+            var courseExists = await coursesCollection.Find(c => c.Id == id).AnyAsync();
+
+            if (!courseExists)
+            {
+                throw new GraphQLException(ErrorBuilder.New()
                     .SetMessage("Course not found")
                     .SetCode("COURSE_NOT_FOUND")
                     .Build());
+            }
+
+            await sectionCollection.DeleteManyAsync(s => s.CourseId == id);
+            await lectureCollection.DeleteManyAsync(l => l.CourseId == id);
+            var result = await coursesCollection.DeleteOneAsync(c => c.Id == id);
+
             return result.DeletedCount > 0;
         }
     }

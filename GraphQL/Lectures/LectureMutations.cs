@@ -96,6 +96,7 @@ namespace TutoringAcademy.GraphQL.Lectures
             await lecturesCollection.InsertOneAsync(lecture);
             return new CreateLectureResponse
             {
+                Id = lecture.Id,
                 CourseId = lecture.CourseId,
                 SectionId = lecture.SectionId,
                 Title = lecture.Title,
@@ -105,6 +106,80 @@ namespace TutoringAcademy.GraphQL.Lectures
                 Content = lecture.Content,
                 Order = lecture.Order
             };
+        }
+
+        public async Task<UpdateLectureResponse> UpdateLectureAsync(
+            UpdateLectureInput input,
+             [Service] IMongoDatabase database)
+        {
+            var lecturesCollection = database.GetCollection<Lecture>("lectures");
+            var lectureExists = await lecturesCollection.Find(l => l.Id == input.Id).AnyAsync();
+
+            if (!lectureExists)
+            {
+                throw new GraphQLException(ErrorBuilder.New()
+                    .SetMessage("Lecture not found")
+                    .SetCode("LECTURE_NOT_FOUND")
+                    .Build());
+            }
+
+             if (input.Order <= 0)
+            {
+                throw new GraphQLException(ErrorBuilder.New()
+                    .SetMessage("Lecture order must be a positive integer")
+                    .SetCode("INVALID_LECTURE_ORDER")
+                    .Build());
+            }
+
+             var filter = Builders<Lecture>.Filter.Eq(l => l.Id, input.Id);
+            var update = Builders<Lecture>.Update
+                .Set(l => l.Title, input.Title)
+                .Set(l => l.Type, input.Type)
+                .Set(l => l.YoutubeEmbedId, input.YoutubeEmbedId)
+                .Set(l => l.Duration, input.Duration)
+                .Set(l => l.Content, input.Content)
+                .Set(l => l.Order, input.Order);
+
+            var result = await lecturesCollection.FindOneAndUpdateAsync(filter, update, new FindOneAndUpdateOptions<Lecture>{ReturnDocument = ReturnDocument.After}) ?? throw new GraphQLException(ErrorBuilder.New()
+                .SetMessage("Lecture not found.")
+                .SetCode("LECTURE_NOT_FOUND")
+                .Build());
+
+            return new UpdateLectureResponse
+            {
+                Id = result.Id,
+                CourseId = result.CourseId,
+                SectionId = result.SectionId,
+                Title = result.Title,
+                Type = result.Type,
+                YoutubeEmbedId = result.YoutubeEmbedId,
+                Duration = result.Duration,
+                Content = result.Content,
+                Order = result.Order
+            };
+        }
+
+        public async Task<bool> DeleteLectureAsync(
+            string lectureId,
+            [Service] IMongoDatabase database)
+        {
+            var lecturesCollection = database.GetCollection<Lecture>("lectures");
+            var lectureExists = await lecturesCollection.Find(l => l.Id == lectureId).AnyAsync();
+
+            if (!lectureExists)
+            {
+                throw new GraphQLException(ErrorBuilder.New()
+                    .SetMessage("Lecture not found")
+                    .SetCode("LECTURE_NOT_FOUND")
+                    .Build());
+            }
+
+            var result = await lecturesCollection.DeleteOneAsync(l => l.Id == lectureId) ?? throw new GraphQLException(ErrorBuilder.New()
+                .SetMessage("Lecture not found.")
+                .SetCode("LECTURE_NOT_FOUND")
+                .Build());
+
+            return result.DeletedCount > 0;
         }
     }
 }
