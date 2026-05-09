@@ -5,6 +5,7 @@ namespace TutoringAcademy.DTOs.Courses
     // This class represents the input data required to update an existing course. It includes properties such as title, description, price, level, and status of the course.
     public class UpdateCourseInput
     {
+        public List<string> TutorId { get; set; } = [];
         public string Title { get; set; } = null!;
         public string Description { get; set; } = null!;
         public string ShortDescription { get; set; } = null!;

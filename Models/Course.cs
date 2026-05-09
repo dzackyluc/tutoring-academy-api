@@ -4,13 +4,16 @@ using MongoDB.Bson.Serialization.Attributes;
 namespace TutoringAcademy.Models
 {
     // This class represents a course in the tutoring academy. 
-    // It includes properties such as title, description, price, level, and status of the course. 
+    // It includes properties such as instructorId, title, description, price, and status to define the course details.
     // The class also defines enumerations for course level and status to categorize the courses accordingly.
     public class Course
     {
         [BsonId]
         [BsonRepresentation(BsonType.ObjectId)]
         public string Id { get; set; } = null!;
+
+        [BsonElement("tutorId")]
+        public List<string> TutorId { get; set; } = [];
 
         [BsonElement("title")]
         public string Title { get; set; } = null!;

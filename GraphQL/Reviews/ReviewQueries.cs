@@ -8,7 +8,8 @@ namespace TutoringAcademy.GraphQL.Reviews
     [ExtendObjectType(typeof(Query))]
     public class ReviewQueries
     {
-        // This query allows authenticated users to retrieve a list of reviews. It supports projection, filtering, and sorting.
+        // This query allows anyone, including unauthenticated users, to retrieve a list of reviews. It supports projection, filtering, and sorting to enable flexible querying of review data.
+        [AllowAnonymous]
         [UseProjection]
         [UseFiltering]
         [UseSorting]

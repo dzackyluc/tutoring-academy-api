@@ -25,10 +25,41 @@ namespace TutoringAcademy.GraphQL.Courses
             [GraphQLType(typeof(UploadType))] IFile? thumbnail,
             [Service] IMongoDatabase database)
         {
+            var userCollection = database.GetCollection<User>("users");
             var coursesCollection = database.GetCollection<Course>("courses");
+            var courseExists = await coursesCollection.Find(c => c.Title == input.Title).AnyAsync();
             var thumbnailUrl = "https://ui-avatars.com/api/?size=512&font-size=0.01&background=0D8ABC";
             var slug = input.Title.ToLower().Replace(" ", "-");
 
+            if (courseExists)
+            {
+                throw new GraphQLException(ErrorBuilder.New()
+                    .SetMessage("Course with the same title already exists")
+                    .SetCode("COURSE_ALREADY_EXISTS")
+                    .Build());
+            }
+
+            if (input.TutorId.Count == 0)
+            {
+                throw new GraphQLException(ErrorBuilder.New()
+                    .SetMessage("At least one tutor must be assigned to the course")
+                    .SetCode("TUTOR_REQUIRED")
+                    .Build());
+            }
+
+            for (int i = 0; i < input.TutorId.Count; i++)
+            {
+                var tutorId = input.TutorId[i];
+                var tutorExists = await userCollection.Find(u => u.Id == tutorId && u.Role == UserRole.Tutor).AnyAsync();
+                if (!tutorExists)
+                {
+                    throw new GraphQLException(ErrorBuilder.New()
+                        .SetMessage($"Tutor with that ID does not exist")
+                        .SetCode("TUTOR_NOT_FOUND")
+                        .Build());
+                }
+            }
+            
             if (thumbnail != null)
             {
                 // Handle thumbnail upload and set the thumbnail URL in the course object
@@ -47,6 +78,7 @@ namespace TutoringAcademy.GraphQL.Courses
 
             var course = new Course
             {
+                TutorId = input.TutorId,
                 Title = input.Title,
                 Slug = slug,
                 ThumbnailUrl = thumbnailUrl,
@@ -87,7 +119,16 @@ namespace TutoringAcademy.GraphQL.Courses
         {
             var coursesCollection = database.GetCollection<Course>("courses");
 
+            if (input.TutorId.Count == 0)
+            {
+                throw new GraphQLException(ErrorBuilder.New()
+                    .SetMessage("At least one tutor must be assigned to the course")
+                    .SetCode("TUTOR_REQUIRED")
+                    .Build());
+            }
+
             var update = Builders<Course>.Update
+                .Set(c => c.TutorId, input.TutorId)
                 .Set(c => c.Title, input.Title)
                 .Set(c => c.Description, input.Description)
                 .Set(c => c.ShortDescription, input.ShortDescription)

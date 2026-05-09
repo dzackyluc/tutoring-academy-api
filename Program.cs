@@ -9,6 +9,8 @@ using TutoringAcademy.GraphQL.Users;
 using Amazon.S3;
 using TutoringAcademy.GraphQL.Courses;
 using TutoringAcademy.GraphQL.Reviews;
+using TutoringAcademy.GraphQL.Sections;
+using TutoringAcademy.GraphQL.Lectures;
 
 Env.Load();
 
@@ -93,6 +95,14 @@ builder.Services
     // This modular approach helps to organize the GraphQL schema and keep review-related logic separate from other parts of the application.
     .AddTypeExtension<ReviewQueries>()
     .AddTypeExtension<ReviewMutations>()
+    // The SectionQueries and SectionMutations classes are added as type extensions to the GraphQL server, allowing them to define additional queries and mutations related to section operations such as creating, updating, and retrieving sections. 
+    // This modular approach helps to organize the GraphQL schema and keep section-related logic separate from other parts of the application.
+    .AddTypeExtension<SectionQueries>()
+    .AddTypeExtension<SectionMutations>()
+    // The LectureQueries and LectureMutations classes are added as type extensions to the GraphQL server, allowing them to define additional queries and mutations related to lecture operations such as creating, updating, and retrieving lectures. 
+    // This modular approach helps to organize the GraphQL schema and keep lecture-related logic separate from other parts of the application.
+    .AddTypeExtension<LectureQueries>()
+    .AddTypeExtension<LectureMutations>()
     // Authorization is added to the GraphQL server, enabling the use of authorization attributes on queries and mutations to restrict access based on user roles and authentication status.
     .AddAuthorization()
     // MongoDB-specific features are added to the GraphQL server, allowing for filtering, sorting, projections, and paging of data retrieved from MongoDB collections in response to GraphQL queries.
