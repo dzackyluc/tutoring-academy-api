@@ -129,6 +129,10 @@ namespace TutoringAcademy.GraphQL.Enrollments
                 await batchCollection.UpdateOneAsync(b => b.Id == input.BatchId, statusUpdate);
             }
 
+            // update user's enrolled courses
+            var userUpdate = Builders<User>.Update.Push(u => u.EnrolledCourses, input.CourseId);
+            await userCollection.UpdateOneAsync(u => u.Id == input.UserId, userUpdate);
+
             await paymentsCollection.InsertOneAsync(payment);
             await enrollmentsCollection.InsertOneAsync(enrollment);
 
