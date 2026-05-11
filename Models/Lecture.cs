@@ -18,10 +18,6 @@ namespace TutoringAcademy.Models
         [BsonElement("title")]
         public string Title { get; set; } = null!;
 
-        [BsonElement("type")]
-        [BsonRepresentation(BsonType.String)]
-        public LectureType Type { get; set; }
-
         [BsonElement("youtubeEmbedId")]
         public string YoutubeEmbedId { get; set; } = null!;
 
@@ -33,12 +29,5 @@ namespace TutoringAcademy.Models
 
         [BsonElement("order")]
         public int Order { get; set; }
-    }
-
-    public enum LectureType
-    {
-        Video,
-        Quiz,
-        Article
     }
 }

@@ -9,8 +9,9 @@ namespace TutoringAcademy.GraphQL.Users
     [ExtendObjectType(typeof(Query))]
     public class UserQueries
     {
-        // This query allows authenticated users to retrieve a list of users. It supports projection, filtering, and sorting to enable flexible querying of user data.
+        // This query allows authenticated users to retrieve a list of users. It supports paging, projection, filtering, and sorting to enable flexible querying of user data.
         [Authorize]
+        [UsePaging(IncludeTotalCount = true)]
         [UseProjection]
         [UseFiltering]
         [UseSorting]

@@ -9,8 +9,9 @@ namespace TutoringAcademy.GraphQL.Lectures
     [ExtendObjectType(typeof(Query))]
     public class LectureQueries
     {
-        // This query allows authenticated users to retrieve a list of lectures. It supports projection, filtering, and sorting.
+        // This query allows authenticated users to retrieve a list of lectures. It supports paging, projection, filtering, and sorting.
         [Authorize]
+        [UsePaging(IncludeTotalCount = true)]
         [UseProjection]
         [UseFiltering]
         [UseSorting]

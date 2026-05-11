@@ -9,8 +9,9 @@ namespace TutoringAcademy.GraphQL.Sections
     [ExtendObjectType(typeof(Query))]
     public class SectionQueries
     {
-        // This query allows authenticated users to retrieve a list of sections. It supports projection, filtering, and sorting.
+        // This query allows authenticated users to retrieve a list of sections. It supports paging, projection, filtering, and sorting.
         [Authorize]
+        [UsePaging(IncludeTotalCount = true)]
         [UseProjection]
         [UseFiltering]
         [UseSorting]

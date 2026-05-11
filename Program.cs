@@ -11,6 +11,9 @@ using TutoringAcademy.GraphQL.Courses;
 using TutoringAcademy.GraphQL.Reviews;
 using TutoringAcademy.GraphQL.Sections;
 using TutoringAcademy.GraphQL.Lectures;
+using TutoringAcademy.GraphQL.Batches;
+using TutoringAcademy.GraphQL.Enrollments;
+using TutoringAcademy.GraphQL.Payments;
 
 Env.Load();
 
@@ -24,6 +27,8 @@ builder.Services.Configure<JWTSettings>(
     builder.Configuration.GetSection("JWTSettings"));
 builder.Services.Configure<B2Settings>(
     builder.Configuration.GetSection("B2Settings"));
+builder.Services.Configure<MidtransSettings>(
+    builder.Configuration.GetSection("MidtransSettings"));
 
 // Register services for dependency injection
 // The JWTService is registered as a singleton, allowing it to be injected into other parts of the application where JWT token generation is needed.
@@ -74,6 +79,8 @@ builder.Services.AddCors(options =>
                .AllowAnyHeader();
     });
 });
+// Register the background service for updating batch statuses, allowing it to run periodically in the background and update the status of batches in the database based on their start and end dates.
+builder.Services.AddHostedService<BatchStatusService>();
 // The GraphQL server is configured with query and mutation types, as well as extensions for user-related operations. 
 // It also includes authorization and MongoDB-specific features such as filtering, sorting, projections, and paging providers to enhance the functionality of the GraphQL API for the tutoring academy application.
 builder.Services.AddControllers();
@@ -103,6 +110,17 @@ builder.Services
     // This modular approach helps to organize the GraphQL schema and keep lecture-related logic separate from other parts of the application.
     .AddTypeExtension<LectureQueries>()
     .AddTypeExtension<LectureMutations>()
+    // The BatchMutations and BatchQueries classes are added as type extensions to the GraphQL server, allowing them to define additional mutations and queries related to batch operations such as creating and updating batches. 
+    // This modular approach helps to organize the GraphQL schema and keep batch-related logic separate from other parts of the application.
+    .AddTypeExtension<BatchMutations>()
+    .AddTypeExtension<BatchQueries>()
+    // The EnrollmentMutations and EnrollmentQueries classes are added as type extensions to the GraphQL server, allowing them to define additional mutations and queries related to enrollment operations such as creating and updating enrollments. 
+    // This modular approach helps to organize the GraphQL schema and keep enrollment-related logic separate from other parts of the application.
+    .AddTypeExtension<EnrollmentMutations>()
+    .AddTypeExtension<EnrollmentQueries>()
+    // The PaymentQueries class is added as a type extension to the GraphQL server, allowing it to define additional queries related to payment operations such as retrieving payment information. 
+    // This modular approach helps to organize the GraphQL schema and keep payment-related logic separate from other parts of the application.
+    .AddTypeExtension<PaymentQueries>()
     // Authorization is added to the GraphQL server, enabling the use of authorization attributes on queries and mutations to restrict access based on user roles and authentication status.
     .AddAuthorization()
     // MongoDB-specific features are added to the GraphQL server, allowing for filtering, sorting, projections, and paging of data retrieved from MongoDB collections in response to GraphQL queries.
@@ -117,11 +135,6 @@ builder.Services
 // Build the application
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
-    app.MapOpenApi();
-}
 // The authentication and authorization middleware are added to the request pipeline, ensuring that incoming requests are properly authenticated and authorized based on the JWT tokens provided by the clients.
 app.UseAuthentication();
 app.UseAuthorization();

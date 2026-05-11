@@ -7,6 +7,7 @@ namespace TutoringAcademy.DTOs.Sections
     {
         public string CourseId { get; set; } = null!;
         public string Title { get; set; } = null!;
+        public SectionType Type { get; set; }
         public int Order { get; set; }
     }
 }

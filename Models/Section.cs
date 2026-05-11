@@ -18,7 +18,18 @@ namespace TutoringAcademy.Models
         [BsonElement("title")]
         public string Title { get; set; } = null!;
 
+        [BsonElement("type")]
+        [BsonRepresentation(BsonType.String)]
+        public SectionType Type { get; set; }
+
         [BsonElement("order")]
         public int Order { get; set; }
+    }
+
+    public enum SectionType
+    {
+        Video,
+        Quiz,
+        Article
     }
 }

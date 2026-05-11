@@ -1,5 +1,3 @@
-using Amazon.S3;
-using Amazon.S3.Model;
 using HotChocolate.Authorization;
 using HotChocolate.Data;
 using MongoDB.Driver;
@@ -24,6 +22,7 @@ namespace TutoringAcademy.GraphQL.Lectures
             var sectionExists = await sectionsCollection.Find(s => s.Id == input.SectionId).AnyAsync();
             var courseExists = await courseCollection.Find(c => c.Id == input.CourseId).AnyAsync();
             var lectureExists = await lecturesCollection.Find(l => l.SectionId == input.SectionId && l.Order == input.Order).AnyAsync();
+            var sectionType = await sectionsCollection.Find(s => s.Id == input.SectionId).Project(s => s.Type).FirstOrDefaultAsync();
 
             if (!courseExists)
             {
@@ -49,7 +48,7 @@ namespace TutoringAcademy.GraphQL.Lectures
                     .Build());
             }
 
-             if (input.Type == LectureType.Video && string.IsNullOrEmpty(input.YoutubeEmbedId))
+             if (sectionType == SectionType.Video && string.IsNullOrEmpty(input.YoutubeEmbedId))
             {
                 throw new GraphQLException(ErrorBuilder.New()
                     .SetMessage("YouTube embed ID is required for video lecture")
@@ -57,11 +56,27 @@ namespace TutoringAcademy.GraphQL.Lectures
                     .Build());
             }
 
-             if (input.Type == LectureType.Article && string.IsNullOrEmpty(input.Content))
+            if (sectionType == SectionType.Video && !string.IsNullOrEmpty(input.Content))
+            {
+                throw new GraphQLException(ErrorBuilder.New()
+                    .SetMessage("Content is not allowed for video lecture")
+                    .SetCode("INVALID_CONTENT")
+                    .Build());
+            }
+
+             if (sectionType == SectionType.Article && string.IsNullOrEmpty(input.Content))
             {
                 throw new GraphQLException(ErrorBuilder.New()
                     .SetMessage("Content is required for article lecture")
                     .SetCode("CONTENT_REQUIRED")
+                    .Build());
+            }
+
+            if (sectionType == SectionType.Article && !string.IsNullOrEmpty(input.YoutubeEmbedId))
+            {
+                throw new GraphQLException(ErrorBuilder.New()
+                    .SetMessage("YouTube embed ID is not allowed for article lecture")
+                    .SetCode("INVALID_YOUTUBE_EMBED_ID")
                     .Build());
             }
 
@@ -86,7 +101,6 @@ namespace TutoringAcademy.GraphQL.Lectures
                 CourseId = input.CourseId,
                 SectionId = input.SectionId,
                 Title = input.Title,
-                Type = input.Type,
                 YoutubeEmbedId = input.YoutubeEmbedId,
                 Duration = input.Duration,
                 Content = input.Content,
@@ -100,7 +114,6 @@ namespace TutoringAcademy.GraphQL.Lectures
                 CourseId = lecture.CourseId,
                 SectionId = lecture.SectionId,
                 Title = lecture.Title,
-                Type = lecture.Type,
                 YoutubeEmbedId = lecture.YoutubeEmbedId,
                 Duration = lecture.Duration,
                 Content = lecture.Content,
@@ -134,7 +147,6 @@ namespace TutoringAcademy.GraphQL.Lectures
              var filter = Builders<Lecture>.Filter.Eq(l => l.Id, input.Id);
             var update = Builders<Lecture>.Update
                 .Set(l => l.Title, input.Title)
-                .Set(l => l.Type, input.Type)
                 .Set(l => l.YoutubeEmbedId, input.YoutubeEmbedId)
                 .Set(l => l.Duration, input.Duration)
                 .Set(l => l.Content, input.Content)
@@ -151,7 +163,6 @@ namespace TutoringAcademy.GraphQL.Lectures
                 CourseId = result.CourseId,
                 SectionId = result.SectionId,
                 Title = result.Title,
-                Type = result.Type,
                 YoutubeEmbedId = result.YoutubeEmbedId,
                 Duration = result.Duration,
                 Content = result.Content,
