@@ -97,7 +97,15 @@ namespace TutoringAcademy.GraphQL.Enrollments
                     .Build());
             }
 
-             var payment = new Payment
+            var result = await response.Content.ReadAsStringAsync();
+            var jsonResponse = System.Text.Json.JsonDocument.Parse(result);
+
+            var midtransUrl = jsonResponse.RootElement.GetProperty("redirect_url").GetString() ?? throw new GraphQLException(ErrorBuilder.New()
+                    .SetMessage("Failed to retrieve payment URL")
+                    .SetCode("PAYMENT_URL_FAILED")
+                    .Build());
+            
+            var payment = new Payment
             {
                 UserId = input.UserId,
                 BatchId = input.BatchId,
@@ -142,7 +150,8 @@ namespace TutoringAcademy.GraphQL.Enrollments
                 CourseId = enrollment.CourseId,
                 UserId = enrollment.UserId,
                 EnrollmentDate = enrollment.EnrollmentDate,
-                Status = enrollment.Status
+                Status = enrollment.Status,
+                MidtransUrl = midtransUrl
             };
         }
 
