@@ -14,6 +14,7 @@ using TutoringAcademy.GraphQL.Lectures;
 using TutoringAcademy.GraphQL.Batches;
 using TutoringAcademy.GraphQL.Enrollments;
 using TutoringAcademy.GraphQL.Payments;
+using TutoringAcademy.GraphQL.Quizzes;
 
 Env.Load();
 
@@ -121,6 +122,10 @@ builder.Services
     // The PaymentQueries class is added as a type extension to the GraphQL server, allowing it to define additional queries related to payment operations such as retrieving payment information. 
     // This modular approach helps to organize the GraphQL schema and keep payment-related logic separate from other parts of the application.
     .AddTypeExtension<PaymentQueries>()
+    // The QuizMutations and QuizQueries classes are added as type extensions to the GraphQL server, allowing them to define additional mutations and queries related to quiz operations such as creating, updating, retrieving, and answering quizzes.
+    // This modular approach helps to organize the GraphQL schema and keep quiz-related logic separate from other parts of the application.
+    .AddTypeExtension<QuizMutations>()
+    .AddTypeExtension<QuizQueries>()
     // Authorization is added to the GraphQL server, enabling the use of authorization attributes on queries and mutations to restrict access based on user roles and authentication status.
     .AddAuthorization()
     // MongoDB-specific features are added to the GraphQL server, allowing for filtering, sorting, projections, and paging of data retrieved from MongoDB collections in response to GraphQL queries.

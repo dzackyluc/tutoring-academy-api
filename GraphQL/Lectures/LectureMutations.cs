@@ -80,6 +80,14 @@ namespace TutoringAcademy.GraphQL.Lectures
                     .Build());
             }
 
+            if (sectionType == SectionType.Quiz)
+            {                
+                throw new GraphQLException(ErrorBuilder.New()
+                    .SetMessage("Cannot add lecture to a quiz section")
+                    .SetCode("INVALID_SECTION_TYPE")
+                    .Build());
+            }
+
              if (input.Duration <= TimeSpan.Zero)
             {
                 throw new GraphQLException(ErrorBuilder.New()
