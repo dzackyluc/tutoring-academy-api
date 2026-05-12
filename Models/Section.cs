@@ -28,8 +28,7 @@ namespace TutoringAcademy.Models
 
     public enum SectionType
     {
-        Video,
-        Quiz,
-        Article
+        Content,
+        Quiz
     }
 }

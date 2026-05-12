@@ -48,7 +48,7 @@ namespace TutoringAcademy.GraphQL.Lectures
                     .Build());
             }
 
-             if (sectionType == SectionType.Video && string.IsNullOrEmpty(input.YoutubeEmbedId))
+             if (input.Type == LectureType.Video && string.IsNullOrEmpty(input.YoutubeEmbedId))
             {
                 throw new GraphQLException(ErrorBuilder.New()
                     .SetMessage("YouTube embed ID is required for video lecture")
@@ -56,7 +56,7 @@ namespace TutoringAcademy.GraphQL.Lectures
                     .Build());
             }
 
-            if (sectionType == SectionType.Video && !string.IsNullOrEmpty(input.Content))
+            if (input.Type == LectureType.Video && !string.IsNullOrEmpty(input.Content))
             {
                 throw new GraphQLException(ErrorBuilder.New()
                     .SetMessage("Content is not allowed for video lecture")
@@ -64,7 +64,7 @@ namespace TutoringAcademy.GraphQL.Lectures
                     .Build());
             }
 
-             if (sectionType == SectionType.Article && string.IsNullOrEmpty(input.Content))
+             if (input.Type == LectureType.Article && string.IsNullOrEmpty(input.Content))
             {
                 throw new GraphQLException(ErrorBuilder.New()
                     .SetMessage("Content is required for article lecture")
@@ -72,7 +72,7 @@ namespace TutoringAcademy.GraphQL.Lectures
                     .Build());
             }
 
-            if (sectionType == SectionType.Article && !string.IsNullOrEmpty(input.YoutubeEmbedId))
+            if (input.Type == LectureType.Article && !string.IsNullOrEmpty(input.YoutubeEmbedId))
             {
                 throw new GraphQLException(ErrorBuilder.New()
                     .SetMessage("YouTube embed ID is not allowed for article lecture")
@@ -112,6 +112,7 @@ namespace TutoringAcademy.GraphQL.Lectures
                 YoutubeEmbedId = input.YoutubeEmbedId,
                 Duration = input.Duration,
                 Content = input.Content,
+                Type = input.Type,
                 Order = input.Order
             };
 
@@ -125,6 +126,7 @@ namespace TutoringAcademy.GraphQL.Lectures
                 YoutubeEmbedId = lecture.YoutubeEmbedId,
                 Duration = lecture.Duration,
                 Content = lecture.Content,
+                Type = lecture.Type,
                 Order = lecture.Order
             };
         }
@@ -158,6 +160,7 @@ namespace TutoringAcademy.GraphQL.Lectures
                 .Set(l => l.YoutubeEmbedId, input.YoutubeEmbedId)
                 .Set(l => l.Duration, input.Duration)
                 .Set(l => l.Content, input.Content)
+                .Set(l => l.Type, input.Type)
                 .Set(l => l.Order, input.Order);
 
             var result = await lecturesCollection.FindOneAndUpdateAsync(filter, update, new FindOneAndUpdateOptions<Lecture>{ReturnDocument = ReturnDocument.After}) ?? throw new GraphQLException(ErrorBuilder.New()
@@ -174,6 +177,7 @@ namespace TutoringAcademy.GraphQL.Lectures
                 YoutubeEmbedId = result.YoutubeEmbedId,
                 Duration = result.Duration,
                 Content = result.Content,
+                Type = result.Type,
                 Order = result.Order
             };
         }

@@ -52,7 +52,6 @@ namespace TutoringAcademy.GraphQL.Sections
             {
                 CourseId = input.CourseId,
                 Title = input.Title,
-                Type = input.Type,
                 Order = order
             };
 
@@ -62,7 +61,6 @@ namespace TutoringAcademy.GraphQL.Sections
             {
                 CourseId = section.CourseId,
                 Title = section.Title,
-                Type = section.Type,
                 Order = section.Order
             };
         }
@@ -93,8 +91,7 @@ namespace TutoringAcademy.GraphQL.Sections
             var filter = Builders<Section>.Filter.Eq(s => s.Id, input.Id);
             var update = Builders<Section>.Update
                 .Set(s => s.Title, input.Title)
-                .Set(s => s.Order, input.Order)
-                .Set(s => s.Type, input.Type);
+                .Set(s => s.Order, input.Order);
 
             var result = await sectionsCollection.FindOneAndUpdateAsync(filter, update, new FindOneAndUpdateOptions<Section>{ReturnDocument = ReturnDocument.After}) ?? throw new GraphQLException(ErrorBuilder.New()
                 .SetMessage("Section not found.")
@@ -105,7 +102,6 @@ namespace TutoringAcademy.GraphQL.Sections
             {
                 Id = result.Id,
                 Title = result.Title,
-                Type = result.Type,
                 Order = result.Order
             };
         }
