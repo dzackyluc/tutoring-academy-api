@@ -59,6 +59,7 @@ namespace TutoringAcademy.GraphQL.Sections
 
             return new CreateSectionResponse
             {
+                Id = section.Id,
                 CourseId = section.CourseId,
                 Title = section.Title,
                 Order = section.Order
@@ -101,6 +102,7 @@ namespace TutoringAcademy.GraphQL.Sections
             return new UpdateSectionResponse
             {
                 Id = result.Id,
+                CourseId = result.CourseId,
                 Title = result.Title,
                 Order = result.Order
             };

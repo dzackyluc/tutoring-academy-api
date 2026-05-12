@@ -6,6 +6,7 @@ namespace TutoringAcademy.DTOs.Sections
     public class UpdateSectionResponse
     {
         public string Id { get; set; } = null!;
+        public string CourseId { get; set; } = null!;
         public string Title { get; set; } = null!;
         public SectionType Type { get; set; }
         public int Order { get; set; }
