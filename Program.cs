@@ -140,19 +140,15 @@ builder.Services
 // Build the application
 var app = builder.Build();
 
-// The authentication and authorization middleware are added to the request pipeline, ensuring that incoming requests are properly authenticated and authorized based on the JWT tokens provided by the clients.
-app.UseAuthentication();
-app.UseAuthorization();
-
-// The controllers and GraphQL endpoints are mapped to the request pipeline, allowing the application to handle incoming HTTP requests for both RESTful API endpoints defined in controllers and GraphQL queries and mutations defined in the GraphQL schema.
-app.MapControllers();
-app.MapGraphQL();
-
 // The HTTPS redirection middleware is added to the request pipeline, ensuring that all incoming requests are redirected to use HTTPS for secure communication between clients and the server.
 app.UseHttpsRedirection();
 // The CORS middleware is added to the request pipeline with the "AllowAll" policy, enabling cross-origin requests from any client application that needs to interact with the API.
 app.UseCors("AllowAll");
-
-
+// The authentication and authorization middleware are added to the request pipeline, ensuring that incoming requests are properly authenticated and authorized based on the JWT tokens provided by the clients.
+app.UseAuthentication();
+app.UseAuthorization();
+// The controllers and GraphQL endpoints are mapped to the request pipeline, allowing the application to handle incoming HTTP requests for both RESTful API endpoints defined in controllers and GraphQL queries and mutations defined in the GraphQL schema.
+app.MapControllers();
+app.MapGraphQL();
 // The application is run, starting the web server and allowing it to listen for incoming requests on the configured port.
 app.Run();
