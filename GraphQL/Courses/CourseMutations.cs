@@ -38,27 +38,6 @@ namespace TutoringAcademy.GraphQL.Courses
                     .SetCode("COURSE_ALREADY_EXISTS")
                     .Build());
             }
-
-            if (input.TutorId.Count == 0)
-            {
-                throw new GraphQLException(ErrorBuilder.New()
-                    .SetMessage("At least one tutor must be assigned to the course")
-                    .SetCode("TUTOR_REQUIRED")
-                    .Build());
-            }
-
-            for (int i = 0; i < input.TutorId.Count; i++)
-            {
-                var tutorId = input.TutorId[i];
-                var tutorExists = await userCollection.Find(u => u.Id == tutorId && u.Role == UserRole.Tutor).AnyAsync();
-                if (!tutorExists)
-                {
-                    throw new GraphQLException(ErrorBuilder.New()
-                        .SetMessage($"Tutor with that ID does not exist")
-                        .SetCode("TUTOR_NOT_FOUND")
-                        .Build());
-                }
-            }
             
             if (thumbnail != null)
             {
@@ -78,7 +57,6 @@ namespace TutoringAcademy.GraphQL.Courses
 
             var course = new Course
             {
-                TutorId = input.TutorId,
                 Title = input.Title,
                 Slug = slug,
                 ThumbnailUrl = thumbnailUrl,
@@ -120,16 +98,7 @@ namespace TutoringAcademy.GraphQL.Courses
         {
             var coursesCollection = database.GetCollection<Course>("courses");
 
-            if (input.TutorId.Count == 0)
-            {
-                throw new GraphQLException(ErrorBuilder.New()
-                    .SetMessage("At least one tutor must be assigned to the course")
-                    .SetCode("TUTOR_REQUIRED")
-                    .Build());
-            }
-
             var update = Builders<Course>.Update
-                .Set(c => c.TutorId, input.TutorId)
                 .Set(c => c.Title, input.Title)
                 .Set(c => c.Description, input.Description)
                 .Set(c => c.ShortDescription, input.ShortDescription)

@@ -27,6 +27,12 @@ namespace TutoringAcademy.Models
         [BsonElement("enrollmentDate")]
         public DateTime EnrollmentDate { get; set; }
 
+        [BsonElement("completionDate")]
+        public DateTime? CompletionDate { get; set; }
+
+        [BsonElement("productType")]
+        public ProductType ProductType { get; set; }
+
         [BsonElement("status")]
         [BsonRepresentation(BsonType.String)]
         public EnrollmentStatus Status { get; set; }
@@ -39,5 +45,13 @@ namespace TutoringAcademy.Models
         Completed,
         Rejected,
         Cancelled
+    }
+
+    public enum ProductType
+    {
+        VideoOnly,
+        MaterialOnly,
+        VideoAndMaterial,
+        FullPackage
     }
 }

@@ -67,11 +67,27 @@ namespace TutoringAcademy.GraphQL.Enrollments
                     .Build());
             }
 
-            var existingEnrollment = await enrollmentsCollection.Find(e => e.CourseId == input.CourseId && e.UserId == input.UserId && e.BatchId == input.BatchId && e.Status == EnrollmentStatus.Pending).FirstOrDefaultAsync();
+            if (input.ProductType == ProductType.FullPackage && string.IsNullOrEmpty(input.BatchId))
+            {
+                throw new GraphQLException(ErrorBuilder.New()
+                    .SetMessage("BatchId is required for FullPackage product type")
+                    .SetCode("BATCH_ID_REQUIRED")
+                    .Build());
+            }
+
+            if (input.ProductType != ProductType.FullPackage && !string.IsNullOrEmpty(input.BatchId))
+            {
+                throw new GraphQLException(ErrorBuilder.New()
+                    .SetMessage("BatchId should be empty for non-FullPackage product types")
+                    .SetCode("BATCH_ID_NOT_ALLOWED")
+                    .Build());
+            }
+
+            var existingEnrollment = await enrollmentsCollection.Find(e => e.CourseId == input.CourseId && e.UserId == input.UserId && e.BatchId == input.BatchId && e.ProductType == input.ProductType && e.Status == EnrollmentStatus.Pending).FirstOrDefaultAsync();
             if (existingEnrollment != null)
             {
                 throw new GraphQLException(ErrorBuilder.New()
-                    .SetMessage("User is already enrolled in this course")
+                    .SetMessage("User is already enrolled in this course with the same batch and product type")
                     .SetCode("ALREADY_ENROLLED")
                     .Build());
             }
@@ -120,6 +136,7 @@ namespace TutoringAcademy.GraphQL.Enrollments
                 CourseId = input.CourseId,
                 BatchId = input.BatchId,
                 UserId = input.UserId,
+                ProductType = input.ProductType,
                 EnrollmentDate = DateTime.UtcNow,
                 Status = EnrollmentStatus.Pending
             };
@@ -149,6 +166,7 @@ namespace TutoringAcademy.GraphQL.Enrollments
                 Id = enrollment.Id,
                 CourseId = enrollment.CourseId,
                 UserId = enrollment.UserId,
+                ProductType = enrollment.ProductType,
                 EnrollmentDate = enrollment.EnrollmentDate,
                 Status = enrollment.Status,
                 MidtransUrl = midtransUrl
@@ -180,7 +198,8 @@ namespace TutoringAcademy.GraphQL.Enrollments
                 CourseId = updatedEnrollment.CourseId,
                 UserId = updatedEnrollment.UserId,
                 EnrollmentDate = updatedEnrollment.EnrollmentDate,
-                Status = updatedEnrollment.Status
+                Status = updatedEnrollment.Status,
+                ProductType = updatedEnrollment.ProductType
             };
         }
 

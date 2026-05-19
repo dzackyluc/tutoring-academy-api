@@ -8,6 +8,7 @@ namespace TutoringAcademy.DTOs.Enrollments
         public string Id { get; set; } = null!;
         public string CourseId { get; set; } = null!;
         public string UserId { get; set; } = null!;
+        public ProductType ProductType { get; set; }
         public DateTime EnrollmentDate { get; set; }
         public EnrollmentStatus Status { get; set; }
     }

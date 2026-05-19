@@ -1,10 +1,7 @@
 using HotChocolate.Authorization;
-using Microsoft.Extensions.Options;
-using HotChocolate.Data;
 using MongoDB.Driver;
 using TutoringAcademy.DTOs.Batches;
 using TutoringAcademy.Models;
-using TutoringAcademy.Settings;
 
 namespace TutoringAcademy.GraphQL.Batches
 {
@@ -19,22 +16,47 @@ namespace TutoringAcademy.GraphQL.Batches
             [Service] IMongoDatabase database)
         {
             var batchesCollection = database.GetCollection<Batch>("batches");
+            var usersCollection = database.GetCollection<User>("users");
+            var courseExists = await database.GetCollection<Course>("courses").Find(c => c.Id == input.CourseId).AnyAsync();
+            var tutorExists = await usersCollection.Find(u => u.Id == input.TutorId && u.Role == UserRole.Tutor).AnyAsync();
+
+            if (!courseExists)
+            {
+                throw new GraphQLException(ErrorBuilder.New()
+                    .SetMessage("Course not found")
+                    .SetCode("COURSE_NOT_FOUND")
+                    .Build());
+            }
+
+            if (!tutorExists)
+            {
+                throw new GraphQLException(ErrorBuilder.New()
+                    .SetMessage("Tutor not found")
+                    .SetCode("TUTOR_NOT_FOUND")
+                    .Build());
+            }
+
+            var update = Builders<User>.Update
+                .AddToSet(u => u.TeachingCourses, input.CourseId);
             
             var batch = new Batch
             {
                 CourseId = input.CourseId,
+                TutorId = input.TutorId,
                 StartDate = input.StartDate,
                 EndDate = input.EndDate,
                 Capacity = input.Capacity,
                 Status = BatchStatus.Available
             };
 
+            await usersCollection.UpdateOneAsync(u => u.Id == input.TutorId, update);
             await batchesCollection.InsertOneAsync(batch);
 
             return new CreateBatchResponse
             {
                 Id = batch.Id,
                 CourseId = batch.CourseId,
+                TutorId = batch.TutorId,
                 StartDate = batch.StartDate,
                 EndDate = batch.EndDate,
                 Capacity = batch.Capacity,
@@ -47,7 +69,10 @@ namespace TutoringAcademy.GraphQL.Batches
             [Service] IMongoDatabase database)
         {
             var batchesCollection = database.GetCollection<Batch>("batches");
+            var usersCollection = database.GetCollection<User>("users");
             var batch = await batchesCollection.Find(b => b.Id == input.Id).FirstOrDefaultAsync();
+            var courseExists = await database.GetCollection<Course>("courses").Find(c => c.Id == input.CourseId).AnyAsync();
+            var tutorExists = await usersCollection.Find(u => u.Id == input.TutorId && u.Role == UserRole.Tutor).AnyAsync();
 
             if (batch == null)
             {
@@ -57,12 +82,32 @@ namespace TutoringAcademy.GraphQL.Batches
                     .Build());
             }
 
+            if (!courseExists)
+            {
+                throw new GraphQLException(ErrorBuilder.New()
+                    .SetMessage("Course not found")
+                    .SetCode("COURSE_NOT_FOUND")
+                    .Build());
+            }
+
+            if (!tutorExists)
+            {
+                throw new GraphQLException(ErrorBuilder.New()
+                    .SetMessage("Tutor not found")
+                    .SetCode("TUTOR_NOT_FOUND")
+                    .Build());
+            }
+
             var update = Builders<Batch>.Update
                 .Set(b => b.CourseId, input.CourseId)
+                .Set(b => b.TutorId, input.TutorId)
                 .Set(b => b.StartDate, input.StartDate)
                 .Set(b => b.EndDate, input.EndDate)
                 .Set(b => b.Capacity, input.Capacity)
                 .Set(b => b.Status, input.Status);
+
+            var tutorUpdate = Builders<User>.Update
+                .AddToSet(u => u.TeachingCourses, input.CourseId);
 
             var result = await batchesCollection.FindOneAndUpdateAsync(
                 b => b.Id == input.Id,
@@ -71,11 +116,22 @@ namespace TutoringAcademy.GraphQL.Batches
                     .SetMessage("Batch not found after update")
                     .SetCode("BATCH_NOT_FOUND_AFTER_UPDATE")
                     .Build());
+            
+            var oldTutorId = batch.TutorId;
+
+            if (oldTutorId != input.TutorId)
+            {
+                await usersCollection.UpdateOneAsync(u => u.Id == input.TutorId, tutorUpdate);
+                var oldTutorUpdate = Builders<User>.Update
+                    .Pull(u => u.TeachingCourses, batch.CourseId);
+                await usersCollection.UpdateOneAsync(u => u.Id == oldTutorId, oldTutorUpdate);
+            }
 
             return new UpdateBatchResponse
             {
                 Id = result.Id,
                 CourseId = result.CourseId,
+                TutorId = result.TutorId,
                 StartDate = result.StartDate,
                 EndDate = result.EndDate,
                 Capacity = result.Capacity,
@@ -88,6 +144,7 @@ namespace TutoringAcademy.GraphQL.Batches
             [Service] IMongoDatabase database)
         {
             var batchesCollection = database.GetCollection<Batch>("batches");
+            var usersCollection = database.GetCollection<User>("users");
             var batchExists = await batchesCollection.Find(b => b.Id == id).AnyAsync();
 
             if (!batchExists)
@@ -97,6 +154,11 @@ namespace TutoringAcademy.GraphQL.Batches
                     .SetCode("BATCH_NOT_FOUND")
                     .Build());
             }
+
+            var batch = await batchesCollection.Find(b => b.Id == id).FirstOrDefaultAsync();
+            var tutorUpdate = Builders<User>.Update
+                .Pull(u => u.TeachingCourses, batch.CourseId);
+            await usersCollection.UpdateOneAsync(u => u.Id == batch.TutorId, tutorUpdate);
 
             var deleteResult = await batchesCollection.DeleteOneAsync(b => b.Id == id);
             return deleteResult.DeletedCount > 0;

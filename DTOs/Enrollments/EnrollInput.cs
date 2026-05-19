@@ -8,5 +8,6 @@ namespace TutoringAcademy.DTOs.Enrollments
         public string CourseId { get; set; } = null!;
         public string BatchId { get; set; } = null!;
         public string UserId { get; set; } = null!;
+        public ProductType ProductType { get; set; }
     }
 }

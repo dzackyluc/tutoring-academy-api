@@ -12,9 +12,6 @@ namespace TutoringAcademy.Models
         [BsonRepresentation(BsonType.ObjectId)]
         public string Id { get; set; } = null!;
 
-        [BsonElement("tutorId")]
-        public List<string> TutorId { get; set; } = [];
-
         [BsonElement("title")]
         public string Title { get; set; } = null!;
 
