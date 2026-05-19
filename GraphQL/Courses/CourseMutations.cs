@@ -96,6 +96,7 @@ namespace TutoringAcademy.GraphQL.Courses
             await coursesCollection.InsertOneAsync(course);
             return new CreateCourseResponse
             {
+                Id = course.Id,
                 Title = course.Title,
                 Description = course.Description,
                 ShortDescription = course.ShortDescription,
@@ -150,6 +151,7 @@ namespace TutoringAcademy.GraphQL.Courses
 
             return new UpdateCourseResponse
             {
+                Id = result.Id,
                 Title = result.Title,
                 Description = result.Description,
                 ShortDescription = result.ShortDescription,

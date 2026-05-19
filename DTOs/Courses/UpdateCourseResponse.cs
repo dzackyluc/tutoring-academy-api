@@ -5,6 +5,7 @@ namespace TutoringAcademy.DTOs.Courses
     // This class represents the response data returned after updating an existing course. It includes properties such as title, description, price, level, and status of the course.
     public class UpdateCourseResponse
     {
+        public string Id { get; set; } = null!;
         public string Title { get; set; } = null!;
         public string Description { get; set; } = null!;
         public string ShortDescription { get; set; } = null!;
